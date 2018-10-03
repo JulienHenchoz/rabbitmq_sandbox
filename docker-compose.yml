@@ -1,0 +1,38 @@
+version: '2'
+
+services:
+  portainer:
+    image: portainer/portainer
+    container_name: "portainer"
+    ports:
+      - "9000:9000"
+    command: -H unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: "rabbitmq"
+    ports:
+        - "15672:15672"
+        - "5672:5672"
+
+  pusher:
+    build: ./pusher/
+    command: "npm run start"
+    container_name: "pusher"
+    depends_on:
+      - rabbitmq
+    ports:
+      - "10001:10001"
+
+  receiver:
+    build: ./receiver/
+    container_name: "receiver"
+    command: "npm run start"
+    depends_on:
+      - rabbitmq
+    ports:
+      - "10002:10002"
+volumes:
+  portainer_data:
