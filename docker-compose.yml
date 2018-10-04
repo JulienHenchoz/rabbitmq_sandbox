@@ -10,9 +10,13 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: "rabbitmq"
+    networks:
+       microservices_net:
+         ipv4_address: 192.168.1.100
     ports:
         - "15672:15672"
         - "5672:5672"
@@ -21,6 +25,9 @@ services:
     build: ./pusher/
     command: "npm run start"
     container_name: "pusher"
+    restart: always
+    networks:
+       - microservices_net
     depends_on:
       - rabbitmq
     ports:
@@ -30,9 +37,20 @@ services:
     build: ./receiver/
     container_name: "receiver"
     command: "npm run start"
+    restart: always
+    networks:
+       - microservices_net
     depends_on:
       - rabbitmq
     ports:
       - "10002:10002"
+
 volumes:
   portainer_data:
+
+networks:
+  microservices_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.1.0/24
