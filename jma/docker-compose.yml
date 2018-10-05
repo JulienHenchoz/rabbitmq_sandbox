@@ -1,0 +1,48 @@
+version: '3'
+services:
+
+  ## RabbitMQ
+  rabbitmq:
+    image: rabbitmq:management
+    environment:
+      RABBITMQ_DEFAULT_USER: ideative
+      RABBITMQ_DEFAULT_PASS: fhscz2TVG4b6CDaqP7AjGtoUq4
+      RABBITMQ_DEFAULT_VHOST: ideative
+    ports:
+    - 15672:15672
+    - 5672:5672
+    networks:
+      microservices:
+        ipv4_address: 10.0.0.10
+    restart: always
+
+
+  ## Hello World - Subscriber
+  hello_world_subscriber:
+    build: ./subscriber
+    networks:
+    - microservices
+    volumes:
+    - ./subscriber:/app
+    depends_on:
+    - rabbitmq
+    #restart: always
+
+  ## Hello World - Publisher
+  hello_world_publisher:
+    build: ./publisher
+    networks:
+    - microservices
+    volumes:
+    - ./publisher:/app
+    depends_on:
+    - rabbitmq
+    #restart: always
+
+networks:
+  microservices:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 10.0.0.0/24
