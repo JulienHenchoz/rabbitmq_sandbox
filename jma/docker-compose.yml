@@ -22,22 +22,18 @@ services:
     build: ./subscriber
     networks:
     - microservices
-    volumes:
-    - ./subscriber:/app
     depends_on:
     - rabbitmq
-    #restart: always
+    restart: on-failure
 
   ## Hello World - Publisher
   hello_world_publisher:
     build: ./publisher
     networks:
     - microservices
-    volumes:
-    - ./publisher:/app
     depends_on:
     - rabbitmq
-    #restart: always
+    restart: on-failure
 
 networks:
   microservices:
