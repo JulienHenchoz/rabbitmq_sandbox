@@ -7,7 +7,7 @@ EXCHANGE = 'default-exchange'
 """ Create connection """
 conn = amqp.BlockingConnection(
     amqp.ConnectionParameters(
-        host='localhost',
+        host='rabbitmq',
         virtual_host='ideative',
         credentials=amqp.credentials.PlainCredentials(
             username='ideative',
