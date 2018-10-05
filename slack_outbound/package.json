@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "amqplib": "^0.5.2"
+    "@slack/client": "^4.8.0",
+    "amqplib": "^0.5.2",
+    "rabbitmq-schema": "^2.0.0"
   }
 }
