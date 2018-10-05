@@ -26,11 +26,11 @@ while True:
             break
     except Exception as ex:
         if len(ex.args) > 1:
-            sys.stdout.write("Exception : %s\n" % ex.args[1])
+            print("Exception : %s" % ex.args[1])
         else:
-            sys.stdout.write("Exception : %s\n" % ex.args[0])
+            print("Exception : %s" % ex.args[0])
 
-        sys.stdout.write("Try again in %d sec\n" % TIME_BEFORE_RECONNECT)
+        print("Try again in %d sec" % TIME_BEFORE_RECONNECT)
         time.sleep(TIME_BEFORE_RECONNECT)
 
 """ Connect channel """
@@ -53,20 +53,20 @@ channel.queue_bind(
     queue=QUEUE
 )
 
-sys.stdout.write(' [*] Waiting for messages. To exit press CTRL+C\n')
+print(" [*] Waiting for messages. To exit press CTRL+C")
 
 
 def callback(ch, method, properties, body):
-    sys.stdout.write(" [x] %r\n" % body)
+    print(" [x] Received %r" % body)
 
-
-channel.basic_consume(
-    callback,
-    queue=QUEUE,
-    no_ack=True
-)
 
 try:
+    channel.basic_consume(
+        callback,
+        queue=QUEUE,
+        no_ack=True
+    )
+
     channel.start_consuming()
 except KeyboardInterrupt:
     channel.close()

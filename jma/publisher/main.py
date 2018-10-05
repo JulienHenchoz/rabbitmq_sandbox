@@ -27,15 +27,21 @@ while True:
             break
     except Exception as ex:
         if len(ex.args) > 1:
-            sys.stdout.write("Exception : %s\n" % ex.args[1])
+            print("Exception : %s" % ex.args[1])
         else:
-            sys.stdout.write("Exception : %s\n" % ex.args[0])
+            print("Exception : %s" % ex.args[0])
 
-        sys.stdout.write("Try again in %d sec\n" % TIME_BEFORE_RECONNECT)
+        print("Try again in %d sec" % TIME_BEFORE_RECONNECT)
         time.sleep(TIME_BEFORE_RECONNECT)
 
 """ Connect channel """
 channel = conn.channel()
+
+""" Create exchange """
+channel.exchange_declare(
+    exchange=EXCHANGE,
+    exchange_type='fanout',
+)
 
 message = {
     'hello': 'world'
@@ -49,14 +55,14 @@ while True:
             routing_key=QUEUE,
             body=json.dumps(message)
         )
-        sys.stdout.write(" [x] Sent %r \n" % json.dumps(message))
+        print(" [x] Sent %r " % json.dumps(message))
 
         time.sleep(TIME_BEFORE_RECONNECT)
     except Exception as ex:
         channel.close()
         conn.close()
         if len(ex.args) > 1:
-            sys.stdout.write("Exception : %s\n" % ex.args[1])
+            print("Exception : %s" % ex.args[1])
         else:
-            sys.stdout.write("Exception : %s\n" % ex.args[0])
+            print("Exception : %s" % ex.args[0])
         sys.exit(1)
