@@ -1,6 +1,6 @@
 var amqp = require('amqplib/callback_api');
 
-var connection = null;
+var channel = null;
 
 /**
  * Initialize the connection to rabbitmq.
@@ -9,11 +9,16 @@ var connection = null;
 var connect = () => {
     return new Promise((resolve, reject) => {
         amqp.connect(process.env.RABBITMQ_URL, (err, conn) => {
-            console.log("Trying to connect to RabbitMQ...");
+            console.log("Trying to connect to RabbitMQ on " + process.env.RABBITMQ_URL + " ...");
             if (err) {
                 throw err;
             }
-            connection = conn;
+            conn.createChannel((err, ch) => {
+                if (err) {
+                    throw err;
+                }
+                channel = ch;
+            });
             console.log("Connected!")
             resolve();
         });
@@ -26,15 +31,15 @@ var connect = () => {
  * @param payload
  */
 var publish = (queue, payload) => {
-    if (!connection) {
+    console.log("Publishing...");
+    if (!channel) {
         throw 'Trying to publish while not connected to RabbitMQ! 1538776047'
     }
-    connection.createChannel((err, ch) => {
-        ch.assertQueue(queue, {durable: false});
+        channel.assertQueue(queue, {durable: false});
+        console.log(JSON.stringify(payload));
         // Note: on Node 6 Buffer.from(msg) should be used
-        ch.sendToQueue(queue, new Buffer(JSON.stringify(payload)));
+        channel.sendToQueue(queue, new Buffer(JSON.stringify(payload)));
         console.log("Sent event to queue '" + queue + "'!");
-    });
 }
 
 /**
@@ -43,18 +48,15 @@ var publish = (queue, payload) => {
  * @param callback
  */
 var consume = (queue, callback) => {
-    if (!connection) {
+    if (!channel) {
         throw 'Trying to consume while not connected to RabbitMQ! 1538777031';
     }
-    connection.createChannel((err, ch) => {
+    channel.assertQueue(queue, {durable: false});
+    console.log("Listening to events on queue '" + queue + "'...", queue);
 
-        ch.assertQueue(queue, {durable: false});
-        console.log("Listening to events on queue '" + queue + "'...", queue);
-
-        ch.consume(queue, function (msg) {
-            callback(msg);
-        }, {noAck: true});
-    });
+    channel.consume(queue, function (msg) {
+        callback(msg);
+    }, {noAck: true});
 }
 
 module.exports.connect = connect;

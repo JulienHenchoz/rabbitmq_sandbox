@@ -1,20 +1,24 @@
 const rabbitmq = require('./helpers/rabbitmq');
-const slack = require('./helpers/slack');
 const config = require('./config/config');
-const queueName = 'slack_outbound';
+const queueName = 'slack_inbound';
+var express = require('express');
+var app = express();
 
 console.info("Starting " + config.workerName + " service!");
 
+app.use(express.json());
+
 rabbitmq.connect().then(() => {
-    rabbitmq.consume(queueName, (msg) => {
-        try {
-            msg = JSON.parse(msg.content.toString());
-            if (schema.validate(queueName, msg)) {
-                slack.post(msg.channel, msg.message);
-            }
-        }
-        catch (err) {
-            console.error(err);
-        }
+    // POST method route
+    app.post('/whois', function (req, res) {
+        rabbitmq.publish('slack_inbound', req.body);
+        res.send('Thanks');
     });
+
+    app.listen(8080, function () {
+        console.log('Example app listening on port 8080!')
+    })
 });
+
+
+

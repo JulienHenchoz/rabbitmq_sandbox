@@ -41,7 +41,7 @@ services:
     container_name: "slack_inbound"
     restart: always
     env_file:
-        - ./workers/slack_inbound/config/current.env
+        - ./workers/slack_inbound/config/development.env
     volumes:
       - ./workers/slack_inbound:/usr/app
     networks:
@@ -49,7 +49,7 @@ services:
     depends_on:
       - rabbitmq
     ports:
-      - "10002:10002"
+      - "10002:8080"
 
 #  receiver:
 #    build: ./workers/receiver/
