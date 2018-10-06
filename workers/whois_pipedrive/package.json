@@ -1,5 +1,5 @@
 {
-  "name": "ideative_slack_outbound",
+  "name": "ideative_whois_pipedrive",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -9,8 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@slack/client": "^4.8.0",
-    "amqplib": "^0.5.2",
-    "rabbitmq-schema": "^2.0.0"
+    "pipedrive": "^6.0.2"
   }
 }

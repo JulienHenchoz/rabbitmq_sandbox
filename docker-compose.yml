@@ -26,6 +26,8 @@ services:
     command: "npm run start"
     container_name: "slack_outbound"
     restart: always
+    env_file:
+      - ./workers/slack_outbound/config/development.env
     volumes:
       - ./workers/slack_outbound:/usr/app
     networks:

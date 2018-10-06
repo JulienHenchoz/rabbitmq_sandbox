@@ -1,5 +1,5 @@
 {
-  "name": "pusher",
+  "name": "ideative_slack_inbound",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",

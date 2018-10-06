@@ -1,4 +1,3 @@
-const rabbitmq = require('./helpers/rabbitmq');
 const config = require('./config/config');
 var express = require('express');
 var app = express();
