@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "pipedrive": "^6.0.2"
+    "amqplib": "^0.5.2",
+    "pipedrive": "^6.0.2",
+    "rabbitmq-schema": "^2.0.0"
   }
 }
