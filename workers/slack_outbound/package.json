@@ -1,0 +1,16 @@
+{
+  "name": "pusher",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@slack/client": "^4.8.0",
+    "amqplib": "^0.5.2",
+    "rabbitmq-schema": "^2.0.0"
+  }
+}

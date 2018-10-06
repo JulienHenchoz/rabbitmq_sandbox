@@ -1,0 +1,5 @@
+# Slack Outbound service
+
+This service listens to the "slack_outbound" queue of RabbitMQ, and posts stuff to slack according to the message content.
+
+The schema of messages can be found in ./config/schema.js

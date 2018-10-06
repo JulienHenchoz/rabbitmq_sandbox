@@ -22,12 +22,12 @@ services:
         - "5672:5672"
 
   slack_outbound:
-    build: ./slack_outbound/
+    build: ./workers/slack_outbound/
     command: "npm run start"
     container_name: "slack_outbound"
     restart: always
     volumes:
-      - ./slack_outbound:/usr/app
+      - ./workers/slack_outbound:/usr/app
     networks:
        - microservices_net
     depends_on:
@@ -35,13 +35,27 @@ services:
     ports:
       - "10001:10001"
 
+    slack_inbound:
+      build: ./workers/slack_inbound/
+      command: "npm run start"
+      container_name: "slack_inbound"
+      restart: always
+      volumes:
+        - ./workers/slack_inbound:/usr/app
+      networks:
+         - microservices_net
+      depends_on:
+        - rabbitmq
+      ports:
+        - "10002:10002"
+
 #  receiver:
-#    build: ./receiver/
+#    build: ./workers/receiver/
 #    container_name: "receiver"
 #    command: "npm run start"
 #    restart: always
 #    volumes:
-#          - ./receiver:/usr/app
+#          - ./workers/receiver:/usr/app
 #    networks:
 #       - microservices_net
 #    depends_on:
