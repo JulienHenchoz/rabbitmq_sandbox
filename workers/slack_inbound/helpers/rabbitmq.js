@@ -8,7 +8,7 @@ var connection = null;
  */
 var connect = () => {
     return new Promise((resolve, reject) => {
-        amqp.connect('amqp://rabbitmq', (err, conn) => {
+        amqp.connect(process.env.RABBITMQ_URL, (err, conn) => {
             console.log("Trying to connect to RabbitMQ...");
             if (err) {
                 throw err;

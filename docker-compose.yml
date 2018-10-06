@@ -35,19 +35,21 @@ services:
     ports:
       - "10001:10001"
 
-    slack_inbound:
-      build: ./workers/slack_inbound/
-      command: "npm run start"
-      container_name: "slack_inbound"
-      restart: always
-      volumes:
-        - ./workers/slack_inbound:/usr/app
-      networks:
-         - microservices_net
-      depends_on:
-        - rabbitmq
-      ports:
-        - "10002:10002"
+  slack_inbound:
+    build: ./workers/slack_inbound/
+    command: "npm run start"
+    container_name: "slack_inbound"
+    restart: always
+    env_file:
+        - ./workers/slack_inbound/config/current.env
+    volumes:
+      - ./workers/slack_inbound:/usr/app
+    networks:
+       - microservices_net
+    depends_on:
+      - rabbitmq
+    ports:
+      - "10002:10002"
 
 #  receiver:
 #    build: ./workers/receiver/

@@ -1,6 +1,5 @@
 const rabbitmq = require('./helpers/rabbitmq');
 const slack = require('./helpers/slack');
-const schema = require('./config/schema');
 const config = require('./config/config');
 const queueName = 'slack_outbound';
 
