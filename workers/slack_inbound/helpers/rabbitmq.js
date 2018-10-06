@@ -6,22 +6,27 @@ var channel = null;
  * Initialize the connection to rabbitmq.
  * If connection failed, try again every 5 seconds.
  */
-var connect = () => {
+var init = () => {
     return new Promise((resolve, reject) => {
-        amqp.connect(process.env.RABBITMQ_URL, (err, conn) => {
-            console.log("Trying to connect to RabbitMQ on " + process.env.RABBITMQ_URL + " ...");
-            if (err) {
-                throw err;
-            }
-            conn.createChannel((err, ch) => {
+        if (channel !== null) {
+            resolve();
+        }
+        else {
+            amqp.connect(process.env.RABBITMQ_URL, (err, conn) => {
+                console.log("Trying to connect to RabbitMQ on " + process.env.RABBITMQ_URL + " ...");
                 if (err) {
                     throw err;
                 }
-                channel = ch;
+                conn.createChannel((err, ch) => {
+                    if (err) {
+                        throw err;
+                    }
+                    channel = ch;
+                });
+                console.log("Connected!")
+                resolve();
             });
-            console.log("Connected!")
-            resolve();
-        });
+        }
     });
 };
 
@@ -36,7 +41,6 @@ var publish = (queue, payload) => {
         throw 'Trying to publish while not connected to RabbitMQ! 1538776047'
     }
         channel.assertQueue(queue, {durable: false});
-        console.log(JSON.stringify(payload));
         // Note: on Node 6 Buffer.from(msg) should be used
         channel.sendToQueue(queue, new Buffer(JSON.stringify(payload)));
         console.log("Sent event to queue '" + queue + "'!");
@@ -59,6 +63,6 @@ var consume = (queue, callback) => {
     }, {noAck: true});
 }
 
-module.exports.connect = connect;
+module.exports.init = init;
 module.exports.publish = publish;
 module.exports.consume = consume;

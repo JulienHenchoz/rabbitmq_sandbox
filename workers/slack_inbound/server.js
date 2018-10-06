@@ -1,22 +1,18 @@
 const rabbitmq = require('./helpers/rabbitmq');
 const config = require('./config/config');
-const queueName = 'slack_inbound';
 var express = require('express');
 var app = express();
+const bodyParser = require('body-parser');
+var whois = require('./routes/whois');
 
 console.info("Starting " + config.workerName + " service!");
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(express.json());
-
-rabbitmq.connect().then(() => {
-    // POST method route
-    app.post('/whois', function (req, res) {
-        rabbitmq.publish('slack_inbound', req.body);
-        res.send('Thanks');
-    });
+rabbitmq.init().then(() => {
+    app.use('/whois', whois);
 
     app.listen(8080, function () {
-        console.log('Example app listening on port 8080!')
+        console.log('Slack Inbound is now listening on port 8080!')
     })
 });
 
