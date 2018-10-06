@@ -6,16 +6,14 @@ const queueName = 'slack_outbound';
 
 console.info("Starting " + config.workerName + " service!");
 
-rabbitmq.connect().then(() => {
-    rabbitmq.consume(queueName, (msg) => {
-        try {
-            msg = JSON.parse(msg.content.toString());
-            if (schema.validate(queueName, msg)) {
-                slack.post(msg.channel, msg.message);
-            }
+rabbitmq.consume(queueName, (msg) => {
+    try {
+        msg = JSON.parse(msg.content.toString());
+        if (schema.validate(queueName, msg)) {
+            slack.post(msg.channel, msg.message);
         }
-        catch (err) {
-            console.error(err);
-        }
-    });
+    }
+    catch (err) {
+        console.error(err);
+    }
 });

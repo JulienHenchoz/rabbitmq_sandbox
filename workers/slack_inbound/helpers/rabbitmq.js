@@ -6,10 +6,10 @@ var channel = null;
  * Initialize the connection to rabbitmq.
  * If connection failed, try again every 5 seconds.
  */
-var init = () => {
-    return new Promise((resolve, reject) => {
+var init = async () => {
+    var result = await new Promise((resolve, reject) => {
         if (channel !== null) {
-            resolve();
+            resolve(channel);
         }
         else {
             amqp.connect(process.env.RABBITMQ_URL, (err, conn) => {
@@ -22,12 +22,13 @@ var init = () => {
                         throw err;
                     }
                     channel = ch;
+                    console.log("Connected!")
+                    resolve(channel);
                 });
-                console.log("Connected!")
-                resolve();
             });
         }
     });
+    return result;
 };
 
 /**
@@ -35,15 +36,16 @@ var init = () => {
  * @param queue
  * @param payload
  */
-var publish = (queue, payload) => {
+var publish = async (queue, payload) => {
     console.log("Publishing...");
     if (!channel) {
-        throw 'Trying to publish while not connected to RabbitMQ! 1538776047'
+        //throw 'Trying to publish while not connected to RabbitMQ! 1538776047'
+        channel = await init();
     }
-        channel.assertQueue(queue, {durable: false});
-        // Note: on Node 6 Buffer.from(msg) should be used
-        channel.sendToQueue(queue, new Buffer(JSON.stringify(payload)));
-        console.log("Sent event to queue '" + queue + "'!");
+    channel.assertQueue(queue, {durable: false});
+    // Note: on Node 6 Buffer.from(msg) should be used
+    channel.sendToQueue(queue, new Buffer(JSON.stringify(payload)));
+    console.log("Sent event to queue '" + queue + "'!");
 }
 
 /**
@@ -51,9 +53,10 @@ var publish = (queue, payload) => {
  * @param queue
  * @param callback
  */
-var consume = (queue, callback) => {
+var consume = async (queue, callback) => {
     if (!channel) {
-        throw 'Trying to consume while not connected to RabbitMQ! 1538777031';
+        //throw 'Trying to consume while not connected to RabbitMQ! 1538777031';
+        channel = await init();
     }
     channel.assertQueue(queue, {durable: false});
     console.log("Listening to events on queue '" + queue + "'...", queue);

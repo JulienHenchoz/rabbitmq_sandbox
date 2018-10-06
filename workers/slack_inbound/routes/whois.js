@@ -9,16 +9,14 @@ var commandName = 'whois';
 
 router.post('/', function(req, res) {
     if (req.body !== {}) {
-        rabbitmq.init().then(() => {
-            var message = {
-                source: req.body.user_id,
-                response_url: req.body.response_url,
-                text: req.body.text,
-            };
-            rabbitmq.publish(commandName, message);
-            console.log("Received payload, pushed to queue '" + commandName + "' : ", req.body);
-            res.send('Let me ask my robot friends about this...');
-        });
+        var message = {
+            source: req.body.user_id,
+            response_url: req.body.response_url,
+            text: req.body.text,
+        };
+        rabbitmq.publish(commandName, message);
+        console.log("Received payload, pushed to queue '" + commandName + "' : ", req.body);
+        res.send('Let me ask my robot friends about this...');
     }
     else {
         res.send('Empty body');

@@ -1,6 +1,6 @@
 const config = require('../config/config');
 const { WebClient } = require('@slack/client');
-const web = new WebClient(config.slackToken);
+const web = new WebClient(process.env.SLACK_TOKEN);
 
 /**
  * Posts a message to the given Slack channel
