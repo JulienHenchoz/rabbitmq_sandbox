@@ -10,7 +10,7 @@ var schema = new RabbitSchema(
                 source: {type: 'string'},
                 text: {type: 'string'}
             },
-            required: ['text', 'response_url', 'source']
+            required: ['text', 'source']
         }
     }
 );

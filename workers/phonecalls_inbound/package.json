@@ -1,0 +1,22 @@
+{
+  "name": "ideative_incomingcalls",
+  "version": "1.0.0",
+  "description": "Incoming Calls (APP) -  This app uses the AMI protocol to listen for events in Ideative's Yeastar voIP server and to push Slack notifications whenever someone receives an incoming call.",
+  "main": "app.js",
+  "dependencies": {
+    "@slack/client": "^4.6.0",
+    "asterisk.io": "^0.1.1",
+    "amqplib": "^0.5.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/cobwebdevelopmentsarl/incoming-calls-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/cobwebdevelopmentsarl/incoming-calls-app#readme"
+}

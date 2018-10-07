@@ -16,7 +16,7 @@ router.post('/', function(req, res) {
         };
         rabbitmq.publish(commandName, message);
         console.log("Received payload, pushed to queue '" + commandName + "' : ", req.body);
-        res.send(':robot_face: Let me ask my robot friends about this...');
+        res.send(':robot_face: Let me ask my robot friends about this... :robot_face:');
     }
     else {
         res.send('Empty body');
