@@ -8,76 +8,89 @@
 const config = require('./config/config');
 const users = require('./models/user');
 const rabbitmq = require('./helpers/rabbitmq');
-console.log("Start service " + config.workerName + "!");
+const RECONNECT_TIMEOUT = 5000;
+
+console.log("Started service " + config.workerName + "!");
 
 var aio = require('asterisk.io'),
     ami = null;
 
+var isConnecting = false;
+
 var initialize = () => {
-    console.log("Initializing connection to AMI service...");
-    /**
-     * Initialize connection to the AMI service on Yeastar server
-     */
-    ami = aio.ami(
-        process.env.YEASTAR_URL,   // Asterisk PBX machine
-        process.env.YEASTAR_PORT,
-        process.env.AMI_USERNAME,
-        process.env.AMI_PASSWORD
-    );
+    if (!isConnecting) {
+        isConnecting = true;
+        console.log("[AMI] Initializing connection to AMI service...");
+        /**
+         * Initialize connection to the AMI service on Yeastar server
+         */
+        ami = aio.ami(
+            process.env.YEASTAR_URL,   // Asterisk PBX machine
+            process.env.YEASTAR_PORT,
+            process.env.AMI_USERNAME,
+            process.env.AMI_PASSWORD
+        );
 
-    /**
-     * Show the world that we're ready to rock
-     */
-    ami.on('ready', function(){
-        console.log('Initialized and listening. Let\'s process some calls!');
-    });
+        /**
+         * Show the world that we're ready to rock
+         */
+        ami.on('ready', function () {
+            isConnecting = false;
+            console.log('[AMI] Initialized and listening. Let\'s process some calls!');
+        });
 
-    /**
-     * In case something fucks up, don't be afraid to tell
-     */
-    ami.on('error', function(err){
-        // throw err;
-        if(err.name == 'E_AMI_SOCKED_CLOSE' || err.name == 'E_AMI_SOCKED_ERROR'){
-            console.log("Reconnecting...");
-            // E_AMI_SOCKED_CLOSE: lost connection to server
-            // E_AMI_SOCKED_ERROR: could not connect, maybe asterisk is down
-            setTimeout(function(){
-                initialize();
-            }, 500); // try to connect/reconnect in 1 second
-        }
-        else {
+        /**
+         * In case something fucks up, don't be afraid to tell
+         */
+        ami.on('error', function (err) {
+            isConnecting = false;
             console.error(err);
-        }
-    });
+            console.log("[AMI] Reconnecting...");
+            setTimeout(function () {
+                initialize();
+            }, RECONNECT_TIMEOUT);
+        });
 
-    /**
-     * For every "DialBegin" event, fetch the user matching the Yeastar number in the users.json file.
-     * If one is found, send a Slack notification to the guy.
-     * Else, say we couldn't find him, better luck next time.
-     */
-    ami.on('eventNewchannel', function(data){
-        console.log(data);
-        var slackId = users.getSlackId(data.Exten);
-        if (slackId) {
-            // Craft a message compatible with the "whois" schema
-            var slackOutboundMessage = {
-                channel: slackId,
-                source: config.workerName,
-                message: getDialBeginText(data)
-            };
-            rabbitmq.publish('slack_outbound', slackOutboundMessage);
+        ami.on('close', function(e) {
+            console.log('[AMI] Closed!');
+        });
+        ami.on('disconnect', function(e) {
+            console.log('[AMI] disconnected!');
+        });
+        ami.on('connect', function(e) {
+            console.log('[AMI] Connected!');
+        });
 
-            var whoisMessage = {
-                source: slackId,
-                text: data.CallerIDNum,
-                response_url: ''
-            };
-            rabbitmq.publish('whois', whoisMessage);
-        }
-        else {
-            console.error('User not found in Slack : ' + data.DestCallerIDNum);
-        }
-    });
+        /**
+         * For every "eventNewchannel" event, fetch the user matching the Yeastar number in the users.json file.
+         * If one is found, send a Slack notification to the guy.
+         * Else, say we couldn't find him, better luck next time.
+         */
+        ami.on('eventNewchannel', function (data) {
+            console.log(data);
+            var slackId = users.getSlackId(data.Exten);
+            if (slackId) {
+                // Notify the Slack user that a call is coming
+                var slackOutboundMessage = {
+                    channel: slackId,
+                    source: config.workerName,
+                    message: getDialBeginText(data)
+                };
+                rabbitmq.publish('slack_outbound', '', slackOutboundMessage);
+
+                // Craft a message compatible with the "whois" schema, so he can receive a hint on who this is
+                var whoisMessage = {
+                    source: slackId,
+                    text: data.CallerIDNum,
+                    response_url: ''
+                };
+                rabbitmq.publish('whois', '', whoisMessage);
+            }
+            else {
+                console.error('User not found in Slack : ' + data.DestCallerIDNum);
+            }
+        });
+    }
 };
 
 users.load().then(() => {

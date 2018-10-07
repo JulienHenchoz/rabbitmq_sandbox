@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/whois', whois);
 
 app.listen(8080, function () {
-    console.log('Slack Inbound is now listening on port 8080!')
+    console.log(config.workerName + ' is now listening on port 8080!')
 });
 
 

@@ -1,26 +1,20 @@
 const config = require('./config/config');
-const pipedrive = require('./helpers/pipedrive');
-const format = require('./helpers/format');
+const search = require('./helpers/search');
 const rabbitmq = require('./helpers/rabbitmq');
 const schema = require('./config/schema');
 
 console.info("Starting " + config.workerName + " service!");
 
 var getOutput = async (text) => {
+    var notFoundString = ':man-shrugging: Search.ch service could not find any matches, sorry! :woman-shrugging: ';
     return new Promise(async (resolve, reject) => {
-        var apiResults = await pipedrive.findPersons(text);
-        var suggestions = [];
-
-        for (var i in apiResults) {
-            var person = apiResults[i];
-            suggestions.push(format.formatPerson(person));
-        }
-        if (suggestions.length > 0) {
-            var intro = ":male-detective: Pipedrive service found " + suggestions.length + " matche(s) :female-detective:  \r\n-\r\n";
-            resolve(intro + suggestions.join("\r\n-\r\n"));
+        var result = await search.find(text);
+        if (result) {
+            var intro = ":male-detective: tel.search.ch service found this : :female-detective:  \r\n-\r\n";
+            resolve(intro + '*Name* : ' + result);
         }
         else {
-            resolve(':man-shrugging: Pipedrive service could not find any matches, sorry! :woman-shrugging: ');
+            resolve(notFoundString);
         }
     });
 

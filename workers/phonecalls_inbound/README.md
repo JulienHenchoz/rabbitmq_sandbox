@@ -1,6 +1,6 @@
 # Phonecalls inbound
 
-This app uses the AMI protocol to listen for events in Ideative's Yeastar voIP server and to push events to the "whois" queue.
+This app uses the AMI protocol to listen for events in Ideative's Yeastar voIP server and to push events to the "whois" exchange.
 
 How-to
 -

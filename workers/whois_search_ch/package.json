@@ -1,5 +1,5 @@
 {
-  "name": "pusher",
+  "name": "ideative_whois_pipedrive",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -9,6 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "amqplib": "^0.5.2"
+    "amqplib": "^0.5.2",
+    "pipedrive": "^6.0.2",
+    "rabbitmq-schema": "^2.0.0",
+    "request": "^2.88.0",
+    "xml2js": "^0.4.19"
   }
 }

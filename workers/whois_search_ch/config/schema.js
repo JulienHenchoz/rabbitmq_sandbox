@@ -1,4 +1,4 @@
-var RabbitSchema = require('rabbitmq-schema')
+var RabbitSchema = require('rabbitmq-schema');
 
 var schema = new RabbitSchema(
     {

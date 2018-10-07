@@ -10,12 +10,12 @@ var commandName = 'whois';
 router.post('/', function(req, res) {
     if (req.body !== {}) {
         var message = {
-            source: req.body.user_id,
-            response_url: req.body.response_url,
+            channel: req.body.user_id,
             text: req.body.text,
         };
-        rabbitmq.publish(commandName, message);
-        console.log("Received payload, pushed to queue '" + commandName + "' : ", req.body);
+        // Publish the whois event to the exchange "whois", to all queues
+        rabbitmq.publish(commandName, '', message);
+        console.log("Received payload, pushed to exchange '" + commandName + "' : ", req.body);
         res.send(':robot_face: Let me ask my robot friends about this... :robot_face:');
     }
     else {
