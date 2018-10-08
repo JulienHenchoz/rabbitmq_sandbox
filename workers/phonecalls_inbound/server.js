@@ -99,12 +99,11 @@ users.load().then(() => {
     console.error(err);
 });
 
-
 /**
- * Extracts core informations from the raw AMI data
+ *
  * @param data
- * @returns {{incomingNumber: *, incomingName: *, destinationNumber: *, destinationName: *}}
+ * @returns {string}
  */
 var getDialBeginText = (data) => {
-    return ':phone:   Incoming call from ' + data.CallerIDNum + ' !';
+    return "---\r\n:phone:   Incoming call from " + data.CallerIDNum + " !\r\n---";
 };

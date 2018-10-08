@@ -18,7 +18,6 @@ var getOutput = async (text) => {
         var output = ["---"];
         if (suggestions.length > 0) {
             output.push(":male-detective:   Pipedrive service found " + suggestions.length + " matche(s)");
-            output.push("-");
             output.push(suggestions.join("\r\n-\r\n"));
         }
         else {

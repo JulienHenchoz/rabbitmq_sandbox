@@ -10,7 +10,12 @@ var find = async (term) => {
             if (body) {
                 parseString(body, (err, result) => {
                     try {
-                        resolve(format.formatResult(result.feed.entry[0]));
+                        if (result.feed.entry !== undefined) {
+                            resolve(format.formatResult(result.feed.entry[0]));
+                        }
+                        else {
+                            resolve(false);
+                        }
                     }
                     catch (err) {
                         console.error(err);
