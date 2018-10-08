@@ -15,24 +15,29 @@ var getOutput = async (text) => {
             var person = apiResults[i];
             suggestions.push(format.formatPerson(person));
         }
+        var output = ["---"];
         if (suggestions.length > 0) {
-            var intro = ":male-detective: Pipedrive service found " + suggestions.length + " matche(s) :female-detective:  \r\n-\r\n";
-            resolve(intro + suggestions.join("\r\n-\r\n"));
+            output.push(":male-detective:   Pipedrive service found " + suggestions.length + " matche(s)");
+            output.push("-");
+            output.push(suggestions.join("\r\n-\r\n"));
         }
         else {
-            resolve(':man-shrugging: Pipedrive service could not find any matches, sorry! :woman-shrugging: ');
+            output.push(':male-detective: :man-shrugging: Pipedrive service could not find any matches, sorry!');
         }
+        output.push("---");
+
+        resolve(output.join("\r\n"));
     });
 
 };
 
-rabbitmq.consume('whois', config.workerName, (msg) => {
+rabbitmq.consume('whois', 'topic', 'name', (msg) => {
     try {
         msg = JSON.parse(msg.content.toString());
         if (schema.validate('whois', msg)) {
             getOutput(msg.text).then((output) => {
                 // Publish the output message to the slack_outbound exchange, to all queues
-                rabbitmq.publish('slack_outbound', '', {
+                rabbitmq.publish('outbound', 'topic', 'slack', {
                     channel: msg.channel,
                     message: output,
                     source: config.workerName

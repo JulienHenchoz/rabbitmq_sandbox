@@ -5,22 +5,46 @@
 var express = require('express');
 var router = express.Router();
 var rabbitmq = require('../helpers/rabbitmq');
-var commandName = 'whois';
+var PhoneNumber = require( 'awesome-phonenumber' );
 
 router.post('/', function(req, res) {
     if (req.body !== {}) {
-        var message = {
+
+        let bindingKey = '';
+        let answer = '';
+        let term;
+        if (term = isPhone(req.body.text)) {
+            bindingKey = 'phone';
+            answer = ':robot_face: Let me ask my robot friends about this phone number "' + term + '"...';
+        }
+        else {
+            term = req.body.text;
+            bindingKey = 'name';
+            answer = ':robot_face: Let me ask my robot friends about "' + term + '"...';
+        }
+        let message = {
             channel: req.body.user_id,
-            text: req.body.text,
+            text: term,
         };
-        // Publish the whois event to the exchange "whois", to all queues
-        rabbitmq.publish(commandName, '', message);
-        console.log("Received payload, pushed to exchange '" + commandName + "' : ", req.body);
-        res.send(':robot_face: Let me ask my robot friends about this... :robot_face:');
+        res.send(answer);
+        rabbitmq.publish('whois', 'topic', bindingKey, message);
     }
     else {
         res.send('Empty body');
     }
 });
+
+var isPhone = (term) => {
+    let phoneNumber = new PhoneNumber(term);
+    let swissPhoneNumber = new PhoneNumber(term, 'CH');
+    let result = null;
+    if (phoneNumber.isPossible()) {
+        result = phoneNumber.getNumber();
+    }
+    if (swissPhoneNumber.isPossible()) {
+        result = swissPhoneNumber.getNumber();
+    }
+    return result;
+};
 
 module.exports = router;

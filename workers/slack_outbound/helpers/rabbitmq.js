@@ -46,10 +46,11 @@ var init = async () => {
 /**
  * Publish an event to the given queue
  * @param exchange
- * @param queue
+ * @param key
+ * @param type
  * @param payload
  */
-var publish = async (exchange, queue, payload) => {
+var publish = async (exchange, type, key = '', payload) => {
     console.log("[AMQP] Publishing...");
     if (connection === null) {
         await init();
@@ -59,20 +60,27 @@ var publish = async (exchange, queue, payload) => {
             console.error(err);
             return;
         }
-        ch.assertExchange(exchange, 'fanout', {durable: false});
+        ch.assertExchange(exchange, type, {durable: false});
 
-        ch.publish(exchange, queue, new Buffer(JSON.stringify(payload)));
-        console.log("[AMQP] Sent event to exchange " + exchange + ", queue '" + queue + "'!");
+        ch.publish(exchange, key, new Buffer(JSON.stringify(payload)));
+        console.log("[AMQP] Sent event to RabbitMQ!", {
+            exchange: exchange,
+            key: key,
+            type: type,
+            payload: payload
+        });
     });
 };
 
 /**
  * Start listening for the given queue
  * @param exchange
- * @param queue
+ * @param key
+ * @param type
  * @param callback
+ * @returns {Promise<void>}
  */
-var consume = async (exchange, queue, callback) => {
+var consume = async (exchange, type, key = '', callback) => {
     if (connection === null) {
         await init();
     }
@@ -81,15 +89,23 @@ var consume = async (exchange, queue, callback) => {
             console.error(err);
             return;
         }
-        ch.assertExchange(exchange, 'fanout', {durable: false});
-        ch.assertQueue(queue, {durable: false});
-        ch.bindQueue(queue, exchange, '');
+        ch.assertExchange(exchange, type, {durable: false});
+        ch.assertQueue('', {exclusive: true}, (err, q) => {
+            ch.bindQueue(q.queue, exchange, key);
 
-        console.log("[AMQP] Listening to events on exchange " + exchange +  ", queue " + queue + "'...", queue);
+            console.log("[AMQP] Listening to RabbitMQ events!", {
+                exchange: exchange,
+                key: key,
+                type: type,
+                queue: q.queue
+            });
 
-        ch.consume(queue, function (msg) {
-            callback(msg);
-        }, {noAck: true});
+            ch.consume(q.queue, function (msg) {
+                console.log('[AMQP] Received message!', msg);
+                callback(msg);
+            }, {noAck: true});
+        });
+
     });
 };
 

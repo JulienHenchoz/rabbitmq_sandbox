@@ -76,18 +76,18 @@ var initialize = () => {
                     source: config.workerName,
                     message: getDialBeginText(data)
                 };
-                rabbitmq.publish('slack_outbound', '', slackOutboundMessage);
+                rabbitmq.publish('outbound', 'topic', 'slack', slackOutboundMessage);
 
                 // Craft a message compatible with the "whois" schema, so he can receive a hint on who this is
                 var whoisMessage = {
-                    source: slackId,
+                    channel: slackId,
                     text: data.CallerIDNum,
                     response_url: ''
                 };
-                rabbitmq.publish('whois', '', whoisMessage);
+                rabbitmq.publish('whois', 'topic', 'phone', whoisMessage);
             }
             else {
-                console.error('User not found in Slack : ' + data.DestCallerIDNum);
+                console.error('User not found in Slack : ' + data.Exten);
             }
         });
     }

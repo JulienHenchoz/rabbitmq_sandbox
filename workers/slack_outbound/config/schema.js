@@ -2,7 +2,7 @@ var RabbitSchema = require('rabbitmq-schema')
 
 var schema = new RabbitSchema(
     {
-        queue: 'slack_outbound',
+        queue: 'outbound',
         messageSchema: {
             type: 'object',
             properties: {
