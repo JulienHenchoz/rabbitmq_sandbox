@@ -1,0 +1,11 @@
+{
+  "name": "ideative_internal_microservices",
+  "version": "1.0.0",
+  "description": "Microservices used internally at Ideative",
+  "repository": "https://github.com/JulienHenchoz/rabbitmq_sandbox",
+  "author": "Ideative <hello@ideative.ch>",
+  "private": true,
+  "scripts": {
+    "build": "PWD=$(pwd) bash scripts/build.sh"
+  }
+}
