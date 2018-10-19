@@ -13,8 +13,8 @@ Default username/password "guest"
 
 
 
-## Scripts :
-`yarn build` to build and push all workers to the Docker registry
-`yarn build worker_name` to build and push `worker_name` worker to the Docker registry
+## Build & deploy :
+- `yarn build` to build and push all workers to the Docker registry
+- `yarn build worker_name` to build and push `worker_name` worker to the Docker registry
 
 
