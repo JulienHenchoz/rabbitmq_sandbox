@@ -13,5 +13,5 @@ CYAN='\033[0;36m'         # Cyan
 WHITE='\033[0;37m'        # White
 
 
-DOCKER_ID_USER="j0n17"
+DOCKER_ID_USER="ideativech"
 DOCKER_DOCKERFILE_NAME="Dockerfile"
