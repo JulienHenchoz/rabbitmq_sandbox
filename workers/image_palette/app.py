@@ -15,6 +15,11 @@ def array_to_color_hex(array):
     return '#' + ''.join([hex(x)[2:] for x in array])
 
 
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': 'Not found'}), 404)
+
+
 @app.route('/', methods=['POST'])
 def tag_image():
     if request.files and 'file' in request.files:
