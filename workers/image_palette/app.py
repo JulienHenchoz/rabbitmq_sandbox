@@ -4,6 +4,7 @@ import uuid
 from flask import Flask
 from flask import jsonify
 from flask import request
+from flask import make_response
 from colorthief import ColorThief
 
 UPLOAD_PATH = '/tmp'
@@ -16,7 +17,7 @@ def array_to_color_hex(array):
 
 
 @app.errorhandler(404)
-def not_found(error):
+def not_found(_):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 
