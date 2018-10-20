@@ -1,0 +1,8 @@
+Click==7.0
+colorthief==0.2.1
+Flask==1.0.2
+ItsDangerous==1.0.0
+Jinja2==2.10
+MarkupSafe==1.0
+Pillow==5.3.0
+Werkzeug==0.14.1
